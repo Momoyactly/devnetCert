@@ -8,7 +8,7 @@ token = get_auth_token()
 
 def getDevices():
     print("*"*50)
-    url = "https://sandboxdnac.cisco.com/api/v1/network-device" 
+    url = "https://sandboxdnac2.cisco.com/api/v1/network-device" 
     header = {'x-auth-token': token, 'content-type' : 'application/json'} 
     device_list = requests.get(url, headers=header,verify=False).json()["response"]
     ids = []
@@ -21,7 +21,7 @@ def getDevices():
 
 def getDeviceIntF(devices=getDevices()):
     print("*"*50)
-    url = "https://sandboxdnac.cisco.com/api/v1/interface"
+    url = "https://sandboxdnac2.cisco.com/api/v1/interface"
     header = {'x-auth-token': token, 'content-type' : 'application/json'} 
     devices_if = requests.get(url, headers=header,verify=False).json()["response"]
     for device in devices:
