@@ -1,4 +1,5 @@
-import requests, os
+import requests, json, urllib3, os
+from termcolor import colored
 from dotenv import load_dotenv
 
 load_dotenv(verbose=True)
@@ -10,6 +11,7 @@ def get_auth_token():
     token = requests.post(url,headers=headers).json()['Token']
     print("Token: ->",token[-5:])
     return token
+
 
 if __name__ == "__main__":
     get_auth_token()

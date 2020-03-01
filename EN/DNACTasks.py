@@ -9,7 +9,7 @@ urllib3.disable_warnings()
 token = get_auth_token() 
 
 
-def getDevices():
+def getDevices(token,DNAC_IP):
     print("*"*50)
     url = DNAC_IP + "/api/v1/network-device" 
     header = {'x-auth-token': token, 'content-type' : 'application/json'} 
@@ -19,10 +19,9 @@ def getDevices():
         deviceType = " ".join(device["type"].split(" ")[1:3])
         print(deviceType,"Time Up: ",device["upTime"])
         ids.append(device["id"])
-    print("*"*50)
     return ids
 
-def getDeviceIntF(devices=getDevices()):
+def getDeviceIntF(token,DNAC_IP,devices=getDevices(token,DNAC_IP)):
     print("*"*50)
     url = DNAC_IP + "/api/v1/interface"
     header = {'x-auth-token': token, 'content-type' : 'application/json'} 
@@ -38,8 +37,22 @@ def getDeviceIntF(devices=getDevices()):
                 else :
                     print(colored(intf["portName"],"yellow"))
 
-    print("*"*50)
 
+def createPathTraceytask(token,DNAC_IP):
+    print("*"*50)
+    url = DNAC_IP+"/api/v1/flow-analysis" 
+    header = {'x-auth-token': token, 'content-type' : 'application/json'} 
+    payload = {"destIP": "10.10.20.81","sourceIP": "10.10.20.82"}
+    taskUrl = requests.post( url, headers=header, json = payload).json()["response"]["url"]
+    return taskUrl
+
+def getPathTraceytask(token,DNAC_IP,taskUrl=createPathTraceytask(token,DNAC_IP)):
+    print("*"*50)
+    url = DNAC_IP+"/api/v1/flow-analysis" 
+    header = {'x-auth-token': token, 'content-type' : 'application/json'} 
+    responseData = requests.get(url, headers=header).json()["response"]
+    return responseData
 
 if __name__ == "__main__":
-    getDeviceIntF()
+    getDeviceIntF(token,DNAC_IP)
+    getPathTraceytask(token,DNAC_IP)
