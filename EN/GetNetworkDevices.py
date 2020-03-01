@@ -1,14 +1,17 @@
-import requests, json, urllib3
+import requests, json, urllib3, os
 from authDNAC import get_auth_token
 from termcolor import colored
+from dotenv import load_dotenv
 
+load_dotenv(verbose=True)
+DNAC_IP = os.getenv('DNAC_IP')
 urllib3.disable_warnings()
 token = get_auth_token() 
 
 
 def getDevices():
     print("*"*50)
-    url = "https://sandboxdnac2.cisco.com/api/v1/network-device" 
+    url = DNAC_IP + "/api/v1/network-device" 
     header = {'x-auth-token': token, 'content-type' : 'application/json'} 
     device_list = requests.get(url, headers=header,verify=False).json()["response"]
     ids = []
@@ -21,7 +24,7 @@ def getDevices():
 
 def getDeviceIntF(devices=getDevices()):
     print("*"*50)
-    url = "https://sandboxdnac2.cisco.com/api/v1/interface"
+    url = DNAC_IP + "/api/v1/interface"
     header = {'x-auth-token': token, 'content-type' : 'application/json'} 
     devices_if = requests.get(url, headers=header,verify=False).json()["response"]
     for device in devices:
@@ -39,4 +42,4 @@ def getDeviceIntF(devices=getDevices()):
 
 
 if __name__ == "__main__":
-    getDeviceIntF(["1cfd383a-7265-47fb-96b3-f069191a0ed5"])
+    getDeviceIntF()
