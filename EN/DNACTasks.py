@@ -3,25 +3,36 @@ from authDNAC import get_auth_token
 from termcolor import colored
 from dotenv import load_dotenv
 
-load_dotenv(verbose=True)
 DNAC_IP = os.getenv('DNAC_IP')
-urllib3.disable_warnings()
-token = get_auth_token() 
+token = get_auth_token(DNAC_IP=DNAC_IP) 
+defaultCommandToRun = ["show ver | inc Software", "show clock"]
 
 
-def getDevices(token,DNAC_IP):
+def getDevices(token,DNAC_IP=DNAC_IP,imprimir= False,idsArray=False):
     print("*"*50)
     url = DNAC_IP + "/api/v1/network-device" 
     header = {'x-auth-token': token, 'content-type' : 'application/json'} 
-    device_list = requests.get(url, headers=header,verify=False).json()["response"]
+    device_list = requests.get(url, headers=header,verify=False).json()
     ids = []
-    for device in device_list:
-        deviceType = " ".join(device["type"].split(" ")[1:3])
-        print(deviceType,"Time Up: ",device["upTime"])
-        ids.append(device["id"])
-    return ids
+    for device in device_list["response"]:
+        if imprimir:
+            deviceType = " ".join(device["type"].split(" ")[1:3])
+            print(deviceType,"Time Up: ",device["upTime"])
+        if idsArray:
+            ids.append(device["id"])
+    if idsArray:
+        return ids
+    else:
+        return device_list["response"]
 
-def getDeviceIntF(token,DNAC_IP,devices=getDevices(token,DNAC_IP)):
+def getDeviceByIP(token,DNAC_IP=DNAC_IP,IP="10.10.20.51"):
+    print("*"*50)
+    url = DNAC_IP + "/dna/intent/api/v1/network-device/ip-address/"+ IP
+    header = {'x-auth-token': token, 'content-type' : 'application/json'} 
+    device = requests.get(url, headers=header,verify=False).json()
+    return device["response"]
+
+def getDeviceIntF(token,DNAC_IP=DNAC_IP,devices=getDevices(token)):
     print("*"*50)
     url = DNAC_IP + "/api/v1/interface"
     header = {'x-auth-token': token, 'content-type' : 'application/json'} 
@@ -29,13 +40,13 @@ def getDeviceIntF(token,DNAC_IP,devices=getDevices(token,DNAC_IP)):
     interfaces={}
     interfaces["response"]=[]
     for device in devices:
-        print("Device Id: ",device)
+        print("Device Id: ",device["id"])
         deviceInterfaces = {}
-        deviceInterfaces["deviceId"] = device
+        deviceInterfaces["deviceId"] = device["id"]
         deviceInterfaces["data"] = []
         for intf in devices_if:
             interface = {}
-            if intf["deviceId"] == device:
+            if intf["deviceId"] == device["id"]:
                 interface["port"]=intf["portName"]
                 interface["status"]=intf["adminStatus"]
                 interface["id"]=intf["id"]
@@ -49,6 +60,22 @@ def getDeviceIntF(token,DNAC_IP,devices=getDevices(token,DNAC_IP)):
         interfaces["response"].append(deviceInterfaces)
     return interfaces
 
+
+def commandRunner(token,DNAC_IP=DNAC_IP,ids=getDevices(token,idsArray=True),commands=defaultCommandToRun):
+    print("*"*50)
+    url = DNAC_IP + "/dna/intent/api/v1/network-device-poller/cli/read-request"
+    header = {'x-auth-token': token, 'content-type' : 'application/json'} 
+    payload = {"name": "show ver","commands":commands,"deviceUuids" : ids}
+    device = requests.post(url, headers=header,json=payload,verify=False).json()
+    return device["response"]["taskId"]
+
+def getTaskById(token,DNAC_IP=DNAC_IP,taskId=commandRunner(token)):
+    print("*"*50)
+    url = DNAC_IP + "/dna/intent/api/v1/task/"+ taskId
+    header = {'x-auth-token': token, 'content-type' : 'application/json'} 
+    device = requests.post(url, headers=header,verify=False).json()
+    return device["response"]
+
 def createPathTraceytask(token,DNAC_IP,destIP="10.10.20.81",sourceIP="10.10.20.82"):
     print("*"*50)
     url = DNAC_IP+"/api/v1/flow-analysis" 
@@ -57,7 +84,7 @@ def createPathTraceytask(token,DNAC_IP,destIP="10.10.20.81",sourceIP="10.10.20.8
     taskUrl = requests.post( url, headers=header, json = payload).json()["response"]["url"]
     return taskUrl
 
-def getPathTraceytask(token,DNAC_IP,taskUrl=createPathTraceytask(token,DNAC_IP)):
+def getPathTraceytask(token,DNAC_IP=DNAC_IP,taskUrl=createPathTraceytask(token,DNAC_IP)):
     print("*"*50)
     url = DNAC_IP + taskUrl
     header = {'x-auth-token': token, 'content-type' : 'application/json'} 
@@ -79,4 +106,4 @@ def getPathTraceytask(token,DNAC_IP,taskUrl=createPathTraceytask(token,DNAC_IP))
     return pathTraceData
 
 if __name__ == "__main__":
-    getPathTraceytask(token,DNAC_IP)
+    print(commandRunner(token))

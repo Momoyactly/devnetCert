@@ -7,13 +7,14 @@ load_dotenv(verbose=True)
 DNAC_IP = os.getenv('DNAC_IP')
 DNAC_USER = os.getenv('DNAC_USER')
 DNAC_PASS = os.getenv('DNAC_PASS')
+urllib3.disable_warnings()
 
-def get_auth_token():
+def get_auth_token( DNAC_IP=DNAC_IP,DNAC_USER=DNAC_USER,DNAC_PASS=DNAC_PASS):
     url =  DNAC_IP + "/dna/system/api/v1/auth/token"       
     token = requests.post(url,auth=HTTPBasicAuth(DNAC_USER,DNAC_PASS)).json()['Token']
-    print("Token: -> ..."+token[-10:])
+    print("Token: -> ..."+token)
     return token
 
 
 if __name__ == "__main__":
-    get_auth_token()
+    get_auth_token(DNAC_IP="https://dcloud-dna-center-inst-rtp.cisco.com",DNAC_USER="demo",DNAC_PASS="demo1234!")
