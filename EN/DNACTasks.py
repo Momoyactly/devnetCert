@@ -67,7 +67,7 @@ def commandRunner(token,DNAC_IP=DNAC_IP,ids=getDevices(token,idsArray=True),comm
     header = {'x-auth-token': token, 'content-type' : 'application/json'} 
     payload = {"name": "show ver","commands":commands,"deviceUuids" : ids}
     device = requests.post(url, headers=header,json=payload,verify=False).json()
-    return device["response"]["taskId"]
+    return device
 
 def getTaskById(token,DNAC_IP=DNAC_IP,taskId=commandRunner(token)):
     print("*"*50)
@@ -105,5 +105,28 @@ def getPathTraceytask(token,DNAC_IP=DNAC_IP,taskUrl=createPathTraceytask(token,D
     print("\n      v\n      v\n".join(imprimible))
     return pathTraceData
 
+def getTemplates(token,DNAC_IP=DNAC_IP):
+    print("*"*50)
+    url = DNAC_IP + "/dna/intent/api/v1/template-programmer/template"
+    header = {'x-auth-token': token, 'content-type' : 'application/json'} 
+    templates = requests.get(url, headers=header,verify=False).json()
+    ids = []
+    for template in templates:
+        ids.append(template["templateId"])
+    return ids
+
+def getTemplateById(token,idi,DNAC_IP=DNAC_IP,imprimir=False):
+    print("*"*50)
+    url = DNAC_IP + "/dna/intent/api/v1/template-programmer/template/"+idi
+    header = {'x-auth-token': token, 'content-type' : 'application/json'} 
+    template = requests.get(url, headers=header,verify=False).json()
+    params = []
+    for parameter in template["templateParams"]:
+        params.append(parameter["parameterName"])
+        if imprimir:
+            print(parameter["parameterName"],parameter["dataType"],parameter["required"])
+    return params
+
+
 if __name__ == "__main__":
-    print(commandRunner(token))
+    print(getTemplateById(token,idi="ae8c6f3c-8698-417c-b21f-38eeb8b4770c",imprimir=True))
