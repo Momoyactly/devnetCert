@@ -127,6 +127,20 @@ def getTemplateById(token,idi,DNAC_IP=DNAC_IP,imprimir=False):
             print(parameter["parameterName"],parameter["dataType"],parameter["required"])
     return params
 
+def deployTemplateByIP(token,IP,DNAC_IP=DNAC_IP):
+    print("*"*50)
+    url = DNAC_IP + "/dna/intent/api/v1/template-programmer/template/deploy"
+    payload = {"templateId":"ae8c6f3c-8698-417c-b21f-38eeb8b4770c","targetInfo": [{"id":IP,"type":"MANAGED_DEVICE_IP","params": {}}]}
+    header = {'x-auth-token': token, 'content-type' : 'application/json'} 
+    taskId = requests.post(url, headers=header,json=payload,verify=False).json()
+    return taskId
+
+def getTemplateDeploymentStatus(token,taskId,DNAC_IP=DNAC_IP):
+    print("*"*50)
+    url = DNAC_IP + "/dna/intent/api/v1/template-programmer/template/deploy"
+    header = {'x-auth-token': token, 'content-type' : 'application/json'} 
+    status = requests.get(url, headers=header,verify=False).json()
+    return status
 
 if __name__ == "__main__":
     print(getTemplateById(token,idi="ae8c6f3c-8698-417c-b21f-38eeb8b4770c",imprimir=True))
