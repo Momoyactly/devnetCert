@@ -17,8 +17,21 @@ def getDevices(sesion,ViptelaIP=ViptelaIP,imprimir=False):
             print("IP      :",device["local-system-ip"])
             print("Model   :",device["device-model"])
             print("")
-    return response
+    return response["data"]
+
+def getDevicesCounters(sesion,ViptelaIP=ViptelaIP,imprimir=False):
+    url = ViptelaIP+"/dataservice/device/counters"
+    response = sesion.get(url,verify=False).json()
+    if imprimir:
+        data = response["data"]
+        for device in data:
+            print("system-ip:",device["system-ip"])
+            print("rebootCount:",device["rebootCount"])
+            print("crashCount:",device["crashCount"])
+            print("")
+    return response["data"]
+
 
 if __name__ == "__main__":
-    getDevices(sesion)
+    getDevicesCounters(sesion,imprimir=True)
     
