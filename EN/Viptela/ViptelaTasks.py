@@ -32,6 +32,18 @@ def getDevicesCounters(sesion,ViptelaIP=ViptelaIP,imprimir=False):
     return response["data"]
 
 
+def getInterfaces(sesion,ViptelaIP=ViptelaIP,imprimir=False):
+    url = ViptelaIP+"/dataservice/statistics/interface"
+    response = sesion.get(url,verify=False).json()
+    if imprimir:
+        data = response["data"]
+        for device in data:
+            print("vdevice_name:",device["vdevice_name"])
+            print("interface:   ",device["interface"])
+            print("oper_status: ",device["oper_status"])
+            print("")
+    return response["data"]
+
 if __name__ == "__main__":
-    getDevicesCounters(sesion,imprimir=True)
+    getInterfaces(sesion,imprimir=True)
     
