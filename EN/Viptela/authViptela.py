@@ -8,7 +8,7 @@ ViptelaUSER = urllib.parse.quote(os.getenv('ViptelaUSER'))
 ViptelaPASS = urllib.parse.quote(os.getenv('ViptelaPASS'))
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-def get_auth_token( ViptelaIP=ViptelaIP,ViptelaUSER=ViptelaUSER,ViptelaPASS=ViptelaPASS):
+def get_auth_token(ViptelaIP=ViptelaIP,ViptelaUSER=ViptelaUSER,ViptelaPASS=ViptelaPASS):
     url = ViptelaIP + "/j_security_check"
     payload = 'j_username={}&j_password={}'.format(ViptelaUSER,ViptelaPASS)
     headers = {'Content-Type': 'application/x-www-form-urlencoded'}

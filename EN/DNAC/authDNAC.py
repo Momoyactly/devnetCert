@@ -11,9 +11,9 @@ urllib3.disable_warnings()
 
 def get_auth_token( DNAC_IP=DNAC_IP,DNAC_USER=DNAC_USER,DNAC_PASS=DNAC_PASS):
     url =  DNAC_IP + "/dna/system/api/v1/auth/token"       
-    token = requests.post(url,auth=HTTPBasicAuth(DNAC_USER,DNAC_PASS)).json()['Token']
+    token = requests.post(url,auth=HTTPBasicAuth(DNAC_USER,DNAC_PASS)).json()
     print("Token: -> ..."+token)
-    return token
+    return token['Token']
 
 
 if __name__ == "__main__":
