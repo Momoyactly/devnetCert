@@ -1,0 +1,18 @@
+---
+- name: Network Getting Started First Playbook
+  become: yes
+  gather_facts: false
+  hosts: CSRvs
+  tasks:
+  - name: crender jinja2 template onto device
+    ios_config:
+      src: "templates/CSRvs.j2"
+      save_when: changed
+    register: cli_output
+    notify: "config_changed"
+  handlers:
+  - name: Reveal config diff only when updated 
+    listen: "config_changed"
+    debug:
+      var: cli_output
+

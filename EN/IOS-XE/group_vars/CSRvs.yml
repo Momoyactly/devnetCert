@@ -1,0 +1,8 @@
+---
+commands: 
+  - show ip interface brief
+  - show interface GigabitEthernet1
+  - show interface GigabitEthernet2
+  - show ip ospf neighbor
+  - show ip ospf 
+  - show run

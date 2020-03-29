@@ -1,0 +1,28 @@
+---
+- name: Network Getting Started First Playbook
+  become: yes
+  gather_facts: false
+  hosts: CSRvs
+  tasks:
+  - name: Gather all  facts
+    ios_facts:
+      gather_subset: all
+    register: facts
+  - name: Display result to terminal window
+    debug:
+       msg: System {{ ansible_net_hostname }} has gateway {{ ansible_net_all_ipv4_addresses[0] }}
+  - name:  Run verification commands
+    ios_command:
+      commands: "{{ commands }}"
+    register: "cli_output" 
+  - name: Ensure outputs/ directory exists
+    file:
+      path: "outputs"
+      state: directory
+    run_once: true
+    delegate_to: localhost
+  - name: Save data to host-specific files
+    template:
+      src: templates/ios_data.j2
+      dest: "{{ playbook_dir }}/outputs/{{inventory_hostname}}_facts.txt"
+    delegate_to: localhost

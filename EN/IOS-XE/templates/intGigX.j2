@@ -1,0 +1,9 @@
+interface {{interface["name"]}}
+    ip address {{ interface["ip"] }} {{ interface["mask"] }}
+{% if interface["shutdown"] %}
+    shutdown
+{% else %}
+    no shutdown
+{% endif %}
+
+    

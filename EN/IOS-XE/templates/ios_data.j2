@@ -1,0 +1,9 @@
+{% for name, data in facts["ansible_facts"]["ansible_net_interfaces"].items() %}
+{{ loop.index }}. {{ name }}: {{ data["operstatus"] }}/{{ data["lineprotocol"] }}
+{% endfor %}
+
+### Commands ##
+{% for  output in cli_output["stdout"] %}
+### New Command ###
+{{ output }}
+{% endfor %}
